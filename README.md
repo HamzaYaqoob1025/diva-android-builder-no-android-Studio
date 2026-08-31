@@ -1,8 +1,12 @@
 ﻿<div align="center">
 
+![diva-android-builder](https://raw.githubusercontent.com/HamzaYaqoob1025/diva-android-builder-no-android-Studio/main/assets/banner.png)
+
 # diva-android-builder
 
-**One script. No Android Studio. Fresh APK in minutes.**
+### Build DIVA Android APK without Android Studio — run on any emulator
+
+**No Android Studio. No manual setup. One script builds the APK and installs it straight to your emulator (tested on MEmu).**
 
 [![Platform](https://img.shields.io/badge/platform-Kali%20%7C%20Ubuntu%20%7C%20WSL-blue?style=flat-square)](https://github.com/HamzaYaqoob1025/diva-android-builder-no-android-Studio)
 [![Java](https://img.shields.io/badge/Java-11-orange?style=flat-square)](https://openjdk.org/projects/jdk/11/)
@@ -11,15 +15,24 @@
 [![NDK](https://img.shields.io/badge/NDK-21.4-green?style=flat-square)](https://developer.android.com/ndk)
 [![License](https://img.shields.io/badge/license-MIT-purple?style=flat-square)](LICENSE)
 
-Builds [DIVA Android](https://github.com/payatu/diva-android) from source — fully automated, idempotent, works on a fresh Kali / Ubuntu / WSL box.
-
 </div>
+
+---
+
+## Why This Exists
+
+Android Studio is a 1 GB+ IDE. Just to build and run DIVA for security testing, you do not need it.
+
+This script builds [DIVA Android](https://github.com/payatu/diva-android) entirely from the command line — no IDE, no GUI, no manual SDK downloads. It produces a `DivaApp.apk` and automatically installs it to your emulator via ADB. Tested with **MEmu** on Windows/WSL.
+
+> **What does "safe to re-run" mean?**
+> Every step checks before acting. If Java is already installed, it skips it. If the SDK is already downloaded, it skips it. If DIVA is already cloned, it just does `git pull`. You can run the script 10 times and it will not break anything or redo work unnecessarily.
 
 ---
 
 ## The Problem
 
-DIVA (Damn Insecure and Vulnerable App) was written in **2015**. Building it in 2025+ fails immediately because:
+DIVA was written in **2015**. Building it in 2025+ fails immediately because:
 
 | Issue | Root Cause |
 |-------|-----------|
@@ -54,7 +67,7 @@ This script silently fixes all three and hands you a working `DivaApp.apk`.
                                 |
                +----------------v----------------+
                |  [3/7]  Android SDK             |
-               |  cmdline-tools 9477386          |
+               |  cmdline-tools (no Studio)      |
                |  -> downloads to ~/android-sdk  |
                |  -> persists PATH in ~/.bashrc  |
                +----------------+----------------+
@@ -104,16 +117,17 @@ This script silently fixes all three and hands you a working `DivaApp.apk`.
 ```bash
 # 1. Clone this repo
 git clone https://github.com/HamzaYaqoob1025/diva-android-builder-no-android-Studio
-cd diva-android-builder
+cd diva-android-builder-no-android-Studio
 
-# 2. Fix Windows line endings if you edited on Windows
+# 2. Fix Windows line endings (only needed if you edited on Windows)
 sed -i 's/\r//' build_diva.sh
 
 # 3. Run it
 bash build_diva.sh
 ```
 
-> That is it. No Android Studio. No manual SDK downloads. No version juggling.
+> No Android Studio. No manual SDK downloads. No version juggling.
+> The script handles everything — Java, SDK, NDK, patches, compile, install.
 
 ---
 
@@ -169,16 +183,17 @@ bash build_diva.sh
 
 ---
 
-## Auto-Install to MEmu (WSL / Windows)
+## Auto-Install to Emulator (MEmu / Any ADB Device)
 
-If `adb` is on your PATH and a device is connected, the script will automatically:
+After the build, the script automatically connects and installs via ADB — no extra steps:
 
 ```
 adb connect 127.0.0.1:21503   <- MEmu default ADB port
 adb install -r DivaApp.apk
 ```
 
-If no device is found, it prints the manual commands instead — the build still succeeds.
+Works with any emulator that supports ADB (MEmu, Genymotion, Android Emulator, etc).
+If no device is found, it prints the manual install command instead — the build still succeeds.
 
 ---
 
@@ -190,14 +205,14 @@ If no device is found, it prints the manual commands instead — the build still
 | Privileges | `sudo` access for `apt install` |
 | Disk space | ~1 GB (SDK + NDK + build cache) |
 | Network | Internet connection (first run only) |
-| Idempotent | Safe to re-run; skips already-done steps |
+| Android Studio | NOT required |
 
 ---
 
 ## Repository Structure
 
 ```
-diva-android-builder/
+diva-android-builder-no-android-Studio/
 +-- build_diva.sh       <- the only file you need
 +-- README.md
 +-- LICENSE
@@ -227,7 +242,5 @@ MIT — do whatever you want, just do not blame us when you find vulnerabilities
 ---
 
 <div align="center">
-Made for security researchers who just want a working APK, not a build environment battle.
+Built because Android Studio is overkill for running a security testing app on MEmu.
 </div>
-
-
